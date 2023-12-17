@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import axios from 'axios';
-import data from './assets/LiteLDC1.json';
+import data from './assets/LDC1.json';
 
 const styles = StyleSheet.create({
 	container: {
@@ -71,11 +71,14 @@ export default function App() {
 		for (let i = 0; i < text.length; i++) {
 			let temp_word = '';
 
-			while ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!') && i < text.length) {
+			if (i + 1 < text.length && text[i + 1] === '\'') {
+				i++;	
+			}
+			while ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!' || text[i] === '\'') && i < text.length) {
 				i++;
 			}
 			while (text[i] !== ' ' && i < text.length) {
-				if ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!') && i < text.length) {
+				if  ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!' || text[i] === '\'')) {
 					i++;
 				}
 				else if (text[i] === 'é' || text[i] === 'è' || text[i] === 'ê') {
@@ -93,46 +96,41 @@ export default function App() {
 			}
 			words.push(temp_word);
 		}
-		for (let i = 0; i < words.length; i++) {
-			if (words[i] === "l'homme") {
-				words.splice(i, 1);
-				words.push("homme");
-			}
-		}
-
 		return (words);
+	}
+
+	function convert_text_to_text_without_accent(text) {
 	}
 
 	function file_to_real_json(data) {
 		let json = {"LDC1": []};
 		let LDC1 = data.LDC1;
-		let wordsTitle = '';
-		let title = '';
-		let wordsParagraph = [];
-		let paragraph = '';
 
 		for (let i = 0; i < LDC1.length; i++) {
-			wordsTitle = '';
-			title = '';
-			wordsParagraph = [];
-			paragraph = '';
+			let wordsTitle = [];
+			let title = '';
+			let wordsParagraph = [];
+			let paragraph = '';
+
 			if (LDC1[i] === '#') {
 				i++;
-				while (LDC1[i] !== '$') {
+				while (LDC1[i] !== '$' && i < LDC1.length) {
 					title += LDC1[i];
 					i++;
 				}
-				console.log(text_to_words(title));
-				//console.log(title);
+				wordsTitle = text_to_words(title);
 			}
-			if (LDC1[i] === '$') {
+			if (LDC1[i] === '$' && i < LDC1.length) {
 				i++;
-				while (LDC1[i] !== '$') {
+				while (LDC1[i] !== '$' && i < LDC1.length) {
 					paragraph += LDC1[i];
 					i++;
 				}
+				wordsParagraph = text_to_words(paragraph);
 				json.LDC1.push({
+					wordsTitle: wordsTitle,
 					title: title,
+					wordsParagraph: wordsParagraph,
 					paragraph: paragraph,
 				});
 			}
