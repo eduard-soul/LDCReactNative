@@ -65,21 +65,65 @@ export default function App() {
 
 	// Usage example
 
+	function text_to_words(text) {
+		let words = [];
+
+		for (let i = 0; i < text.length; i++) {
+			let temp_word = '';
+
+			while ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!') && i < text.length) {
+				i++;
+			}
+			while (text[i] !== ' ' && i < text.length) {
+				if ((text[i] === ' ' || text[i] === ',' || text[i] === '.' || text[i] === '!') && i < text.length) {
+					i++;
+				}
+				else if (text[i] === 'é' || text[i] === 'è' || text[i] === 'ê') {
+					temp_word += 'e';	
+					i++;
+				}
+				else if (text[i] === 'à' || text[i] === 'â') {
+					temp_word += 'a';	
+					i++;
+				}
+				else {
+					temp_word += text[i];	
+					i++;
+				}
+			}
+			words.push(temp_word);
+		}
+		for (let i = 0; i < words.length; i++) {
+			if (words[i] === "l'homme") {
+				words.splice(i, 1);
+				words.push("homme");
+			}
+		}
+
+		return (words);
+	}
+
 	function file_to_real_json(data) {
 		let json = {"LDC1": []};
 		let LDC1 = data.LDC1;
+		let wordsTitle = '';
 		let title = '';
+		let wordsParagraph = [];
 		let paragraph = '';
 
 		for (let i = 0; i < LDC1.length; i++) {
+			wordsTitle = '';
 			title = '';
+			wordsParagraph = [];
 			paragraph = '';
 			if (LDC1[i] === '#') {
+				i++;
 				while (LDC1[i] !== '$') {
 					title += LDC1[i];
 					i++;
 				}
-				console.log(title);
+				console.log(text_to_words(title));
+				//console.log(title);
 			}
 			if (LDC1[i] === '$') {
 				i++;
@@ -98,7 +142,9 @@ export default function App() {
 
 	useEffect(() => {
 		//console.log(data);
-		downloadJsonFile(file_to_real_json(data), 'LDC1.json');
+		let temp = file_to_real_json(data);
+		console.log(temp);
+		//downloadJsonFile(temp, 'LDC1.json');
 	}, []);
 
 	return (
