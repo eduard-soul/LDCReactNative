@@ -160,10 +160,6 @@ export default function App() {
         }
         return words;
     }
-
-    function convert_text_to_text_without_accent(text) {
-    }
-
     function file_to_real_json(data) {
         let json = {"LDC1": []};
         let LDC1 = data.LDC1;
@@ -180,13 +176,13 @@ export default function App() {
                 i++;
             }
             if (LDC1[i] === '#') {
-                console.log('#');
+                //console.log('#');
                 i++;
                 while (LDC1[i] !== '$' && i < LDC1.length) {
                     title += LDC1[i];
                     i++;
                 }
-                console.log(title);
+                //console.log(title);
                 wordsTitle = text_to_words(title);
             }
             if (LDC1[i] === '$' && i < LDC1.length) {
@@ -238,11 +234,11 @@ export default function App() {
     useEffect(() => {
         //console.log(data);
         let real_json = file_to_real_json(data);
-        console.log(real_json);
+        //console.log(real_json);
+        console.log("DONE");
+        //let dictionnary = create_dictionnary(real_json.LDC1);
 
-        let dictionnary = create_dictionnary(real_json.LDC1);
-
-        //downloadJsonFile(temp, 'LDC1.json');
+        //downloadJsonFile(real_json, 'LDC1.json');
     }, []);
 
     return (
