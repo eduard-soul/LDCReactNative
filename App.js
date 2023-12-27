@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View , ScrollView} from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
 import axios from 'axios';
 //import data from './assets/LDC1.json';
 import data from './assets/LDC1_DONE.json'
@@ -19,15 +19,17 @@ export default function App() {
     const [currentParagraph, setCurrentParagraph] = useState('');
     const [currentTitle, setCurrentTitle] = useState('');
     const [currentScores, setCurrentScores] = useState([]);
+    const [currentScoresIndexes, setCurrentScoresIndexes] = useState([[]]);
     const [inputText, setInputText] = useState('');
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const handleInputChange = (text) => {
         setInputText(text);
     };
 
     function it_is_punctuation(word, where) {
-        if (word[where] === '.' || word[where] === ',' 
-            || word[where] === '!' || word[where] === '?' 
+        if (word[where] === '.' || word[where] === ','
+            || word[where] === '!' || word[where] === '?'
             || word[where] === ';' || word[where] === ':'
             || word[where] === ')' || word[where] === ']'
             || word[where] === '}' || word[where] === '"'
@@ -44,8 +46,8 @@ export default function App() {
             || word[where] === '{' || word[where] === '|'
             || word[where] === '°' || word[where] === '§'
             || word[where] === '²' || word[where] === '³'
-            ) {
-                return (1);
+        ) {
+            return (1);
         }
         else {
             return (0);
@@ -63,19 +65,20 @@ export default function App() {
             || (word[0] === 'M' && word[1] === '\'') || (word[0] === 'N' && word[1] === '\'')
             || (word[0] === 'C' && word[1] === '\'') || (word[0] === 'Q' && word[1] === '\'')
             || (word[0] === 'L' && word[1] === '’') || (word[0] === 'D' && word[1] === '’')
-            ) {
-                return (1);
+        ) {
+            return (1);
         }
         return (0);
     }
 
     function replace_accents(text) {
         const accentMap = {
-            á: 'a',é: 'e',í: 'i',ó: 'o',ú: 'u',Á: 'A',É: 'E',Í: 'I',Ó: 'O',Ú: 'U',à: 'a',
-            è: 'e',ì: 'i',ò: 'o',ù: 'u',À: 'A',È: 'E',Ì: 'I',Ò: 'O',Ù: 'U',â: 'a',ê: 'e',
-            î: 'i',ô: 'o',û: 'u',Â: 'A',Ê: 'E',Î: 'I',Ô: 'O',Û: 'U',ã: 'a',õ: 'o',Ã: 'A',
-            Õ: 'O',ä: 'a',ë: 'e',ï: 'i',ö: 'o',ü: 'u',Ä: 'A',Ë: 'E',Ï: 'I',Ö: 'O',Ü: 'U',
-            ç: 'c',Ç: 'C',ñ: 'n',Ñ: 'N', }
+            á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', Á: 'A', É: 'E', Í: 'I', Ó: 'O', Ú: 'U', à: 'a',
+            è: 'e', ì: 'i', ò: 'o', ù: 'u', À: 'A', È: 'E', Ì: 'I', Ò: 'O', Ù: 'U', â: 'a', ê: 'e',
+            î: 'i', ô: 'o', û: 'u', Â: 'A', Ê: 'E', Î: 'I', Ô: 'O', Û: 'U', ã: 'a', õ: 'o', Ã: 'A',
+            Õ: 'O', ä: 'a', ë: 'e', ï: 'i', ö: 'o', ü: 'u', Ä: 'A', Ë: 'E', Ï: 'I', Ö: 'O', Ü: 'U',
+            ç: 'c', Ç: 'C', ñ: 'n', Ñ: 'N',
+        }
         let return_text = '';
 
         for (let i = 0; i < text.length; i++) {
@@ -120,60 +123,71 @@ export default function App() {
         return words;
     }
 
-    function check_input(event) {
-        let words = [];
-        let scores = [];
+    function sort_array_scores_indexes(scores) {
+        let scores_indexes = [];
+
+        for (let i = 0; i < scores.length; i++) {
+            scores_indexes.push([scores[i], i]);
+        }
+        scores_indexes.sort(function (a, b) {
+            return b[0] - a[0];
+        });
+        console.log(scores_indexes);
+        return scores_indexes;
+    }
+
+    function give_score_paragraph_title(words) {
         let LDC1 = data.LDC1;
+        let scores = [];
+
+        for (let i = 0; i < LDC1.length; i++) {
+            let score = 0;
+            let wordsTitle = LDC1[i].wordsTitle;
+            let wordsParagraph = LDC1[i].wordsParagraph;
+
+            for (let j = 0; j < wordsTitle.length; j++) {
+                let word = wordsTitle[j];
+
+                for (let k = 0; k < words.length; k++) {
+                    if (word === words[k]) {
+                        score += 10;
+                    }
+                }
+            }
+            for (let j = 0; j < wordsParagraph.length; j++) {
+                let word = wordsParagraph[j];
+
+                for (let k = 0; k < words.length; k++) {
+                    if (word === words[k]) {
+                        score++;
+                    }
+                }
+            }
+            scores.push(score);
+        }
+        return (scores);
+    }
+
+    function check_input(event) {
+        let scores = [];
+        let LDC1 = data.LDC1; 
 
         //console.log(event);
-        //console.log(inputText)
-        //console.log(event);
+        console.log(inputText)
+        console.log(event);
         if (event.key === 'Enter') {
-            words = text_to_words(inputText);
-            console.log(words);
+            let words = text_to_words(inputText);
             if (words.length > 0) {
-               for (let i = 0; i < LDC1.length; i++) {
-                    let score = 0;
-                    let wordsTitle = LDC1[i].wordsTitle;
-                    let wordsParagraph = LDC1[i].wordsParagraph;
-
-                    for (let j = 0; j < wordsTitle.length; j++) {
-                        let word = wordsTitle[j];
-
-                        for (let k = 0; k < words.length; k++) {
-                            if (word === words[k]) {
-                                score += 10;
-                            }
-                        }
-                    }
-                    for (let j = 0; j < wordsParagraph.length; j++) {
-                        let word = wordsParagraph[j];
-
-                        for (let k = 0; k < words.length; k++) {
-                            if (word === words[k]) {
-                                score++;
-                            }
-                        }
-                    }
-                    scores.push(score);
-               }
-               if (scores) {
-                    let max = 0;
-                    let max_index = 0;
-                    setCurrentScores(scores);
-
-                    for (let i = 0; i < scores.length; i++) {
-                        if (scores[i] > max) {
-                            max = scores[i];
-                            max_index = i;
-                        }
-                    }
-                    if (max_index === 0 && scores[0] === 0) {
-                        max_index = Math.floor(Math.random() * scores.length);
-                    }
-                    setCurrentTitle(LDC1[max_index].title);
-                    setCurrentParagraph(LDC1[max_index].paragraph);
-               }
+                scores = give_score_paragraph_title(words);
+                setCurrentScores(scores);
+                
+                if (scores) {
+                    let temp_sorted_scores = sort_array_scores_indexes(scores);
+                    setCurrentScoresIndexes(temp_sorted_scores);
+                    setCurrentTitle(LDC1[temp_sorted_scores[0][1]].title);
+                    setCurrentParagraph(LDC1[temp_sorted_scores[0][1]].paragraph);
+                    setCurrentIndex(0);
+                }
             }
             else {
                 alert('Entre des mots clés valides');
@@ -210,11 +224,22 @@ export default function App() {
     }
 
     function next_or_previous_paragraph(which) {
-       if (which === 'prev') {
-        
-       } else if (which === 'next') {
-
-       }
+        //scores
+        if (which === 'prev') {
+            if (currentIndex !== 0) {
+                let temp = currentIndex - 1;
+                setCurrentIndex(temp);
+                setCurrentParagraph(data.LDC1[currentScoresIndexes[temp][1]].paragraph);
+                setCurrentTitle(data.LDC1[currentScoresIndexes[temp][1]].title);
+            }
+        } else if (which === 'next') {
+            if (currentIndex < currentScoresIndexes.length - 1) {
+                let temp = currentIndex + 1;
+                setCurrentIndex(temp);
+                setCurrentParagraph(data.LDC1[currentScoresIndexes[temp][1]].paragraph);
+                setCurrentTitle(data.LDC1[currentScoresIndexes[temp][1]].title);
+            }
+        }
     }
 
     useEffect(() => {
@@ -227,15 +252,14 @@ export default function App() {
                 alignItems: 'center',
                 height: '70%',
             }]}>
-                <Text style={[styles.headerTitle, 
-                    Platform.OS !== 'web' ? {marginTop: '15%'} : {marginTop: '5%'}
+                <Text style={[styles.headerTitle,
+                Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' }
                 ]}>L'Eveil Des Consciences</Text>
                 <View style={[styles.titleAndParagraphWrapper]}>
                     <Text style={[styles.currentTitle, {
                     }]}>{currentTitle}</Text>
                     <ScrollView style={[styles.currentParagraphWrapper, {
                         width: '95%',
-                        backgroundColor: 'red',
                     }]}>
                         <Text style={{
                             fontSize: 20,
@@ -250,8 +274,8 @@ export default function App() {
                     <TextInput
                         style={styles.input}
                         onChangeText={handleInputChange}
-                        onKeyPress={(event) => {check_input(event)}}
-                        onSubmitEditing = {() => (check_input({key: 'Enter'}))}
+                        //onKeyPress={(event) => { check_input(event) }}
+                        onSubmitEditing={() => (check_input({ key: 'Enter' }))}
                         value={inputText}
                         placeholder="Écrit des mots clés..."
                         autoFocus={true}
@@ -259,14 +283,14 @@ export default function App() {
                     />
                 </View>
                 <View style={[styles.pressablesWrapper]}>
-                    <Pressable style={[styles.pressable]}>
-                        <Text style={[styles.pressableText]} onPress={next_or_previous_paragraph('prev')}>Précédent</Text>
+                    <Pressable style={[styles.pressable]} onPress={() => {next_or_previous_paragraph('prev')}}>
+                        <Text style={[styles.pressableText]} >Précédent</Text>
                     </Pressable>
-                    <Pressable style={[styles.pressable]} onPress={() => {check_input({key: 'Enter'})}}>
+                    <Pressable style={[styles.pressable]} onPress={() => { check_input({ key: 'Enter' }) }}>
                         <Text style={[styles.pressableText]}>Rechercher</Text>
                     </Pressable>
-                    <Pressable style={[styles.pressable]}>
-                        <Text style={[styles.pressableText]} onPress={next_or_previous_paragraph('next')}>Suivant</Text>
+                    <Pressable style={[styles.pressable]} onPress={() => {next_or_previous_paragraph('next')}}>
+                        <Text style={[styles.pressableText]} >Suivant</Text>
                     </Pressable>
                 </View>
             </View>
