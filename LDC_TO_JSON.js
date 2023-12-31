@@ -24,12 +24,6 @@
         URL.revokeObjectURL(url);
     }
 
-    // Usage example
-
-
-
-
-
     function file_to_real_json(data) {
         let json = {"LDC1": []};
         let LDC1 = data.LDC1;
