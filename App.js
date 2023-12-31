@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View, ScrollView } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View, ScrollView, KeyboardAvoidingView} from 'react-native';
 import axios from 'axios';
 //import data from './assets/LDC1.json';
 import data from './assets/LDC1_DONE.json'
@@ -132,7 +132,7 @@ export default function App() {
         scores_indexes.sort(function (a, b) {
             return b[0] - a[0];
         });
-        console.log(scores_indexes);
+        //console.log(scores_indexes);
         return scores_indexes;
     }
 
@@ -173,8 +173,8 @@ export default function App() {
         let LDC1 = data.LDC1; 
 
         //console.log(event);
-        console.log(inputText)
-        console.log(event);
+        //console.log(inputText)
+        //console.log(event);
         if (event.key === 'Enter') {
             let words = text_to_words(inputText);
             if (words.length > 0) {
@@ -252,25 +252,40 @@ export default function App() {
                 alignItems: 'center',
                 height: '70%',
             }]}>
-                <Text style={[styles.headerTitle,
-                Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' }
-                ]}>L'Eveil Des Consciences</Text>
-                <View style={[styles.titleAndParagraphWrapper]}>
+                <Text style={[styles.headerTitle, 
+                    Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' }
+                ]}>
+                    L'Eveil Des Consciences
+                </Text>
+                <KeyboardAvoidingView style={[styles.titleAndParagraphWrapper]}>
+                <View style={[styles.titleWrapper, 
+                    currentTitle.length > 35 ? { height: '14%' } : { height: '10%' }
+                ]}>
                     <Text style={[styles.currentTitle, {
-                    }]}>{currentTitle}</Text>
-                    <ScrollView style={[styles.currentParagraphWrapper, {
-                        width: '95%',
                     }]}>
-                        <Text style={{
-                            fontSize: 20,
-                            textAlign: 'center',
-                        }}>{currentParagraph}</Text>
-                    </ScrollView>
+                        {currentTitle}
+                    </Text>
                 </View>
+                    <View style={[styles.scrollViewWrapper]}>
+                        <ScrollView style={[styles.currentParagraphWrapper, {
+                            backgroundColor: 'transparent',
+                        }]}>
+                            <View style={{backgroundColor: 'transparent'}}>
+                                <Text style={{
+                                    fontSize: 20,
+                                    textAlign: 'center',
+                                }}>
+                                    {currentParagraph}
+                                </Text>
+                            </View>
+                        </ScrollView>
+                    </View>
+                </KeyboardAvoidingView>
             </View>
             <View style={[styles.bottomSectionWrapper, {
             }]}>
-                <View style={[styles.inputWrapper]}>
+                <View style={[styles.inputWrapper, {
+                }]}>
                     <TextInput
                         style={styles.input}
                         onChangeText={handleInputChange}
@@ -314,16 +329,26 @@ const styles = StyleSheet.create({
         marginTop: 20,
         textAlign: 'center',
     },
+    scrollViewWrapper: {
+        height: '70%',
+        width: '95%',
+    },
     titleAndParagraphWrapper: {
-        height: '80%',
+        width: '100%',
+        height: '100%',
         alignItems: 'center',
+    },
+    titleWrapper: {
+        width: '100%',
+        alignItems: 'center',
+        backgroundColor: 'transparent',
     },
     currentTitle: {
         width: '90%',
         fontSize: 20,
         fontWeight: 'bold',
-        marginTop: 20,
         textAlign: 'center',
+        marginTop: 3,
     },
     currentParagraphWrapper: {
         fontSize: 18,
