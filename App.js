@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View, 
-    ScrollView, KeyboardAvoidingView, Image
+    ScrollView, KeyboardAvoidingView, Image, Keyboard, SafeAreaView
 } from 'react-native';
 import axios from 'axios';
 //import data from './assets/LDC1.json';
@@ -24,6 +24,8 @@ export default function App() {
     const [currentScoresIndexes, setCurrentScoresIndexes] = useState([[]]);
     const [inputText, setInputText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
     const handleInputChange = (text) => {
         setInputText(text);
@@ -251,6 +253,27 @@ export default function App() {
     }
 
     useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener(
+          'keyboardDidShow',
+          () => {
+            setKeyboardVisible(true); // or some other action
+          }
+        );
+      
+        const keyboardDidHideListener = Keyboard.addListener(
+          'keyboardDidHide',
+          () => {
+            setKeyboardVisible(false); // or some other action
+          }
+        );
+      
+        return () => {
+          keyboardDidHideListener.remove();
+          keyboardDidShowListener.remove();
+        };
+      }, []);
+
+    useEffect(() => {
         set_little_random_paragraph();
     }, []);
 
@@ -261,13 +284,15 @@ export default function App() {
                 height: '70%',
             }]}>
                 <Text style={[styles.headerTitle, 
-                    Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' },
+                    Platform.OS === 'web' ? { marginTop: '2.5%' } : { marginTop: '12.5%' },
                     {color: '#AA2D2D'}
                 ]}>
                     L'Eveil Des Consciences
                 </Text>
                 <KeyboardAvoidingView style={[styles.titleAndParagraphWrapper]}>
-                    <View style={[styles.scrollViewWrapper]}>
+                    <SafeAreaView style={[styles.scrollViewWrapper, 
+                        isKeyboardVisible ? {height: '70%'} : {height: '95%'},
+                    ]}>
                         <ScrollView style={[styles.currentParagraphWrapper, {
                             backgroundColor: 'transparent',
                         }]}>
@@ -275,15 +300,18 @@ export default function App() {
                             }]}>
                                 {currentTitle}
                             </Text>
-                            <View style={{backgroundColor: 'transparent'}}>
-                                <Text style={{
-                                    fontSize: 20,
-                                }}>
-                                    {currentParagraph}
-                                </Text>
-                            </View>
+                            <Text style={[{
+                                fontSize: 20,
+                                backgroundColor: 'transparent',
+                                lineHeight: 26,
+                            }, 
+
+                                Platform.OS === 'web' ? {height: 200} : {height: '100%'},
+                            ]}>
+                                {currentParagraph}
+                            </Text>
                         </ScrollView>
-                    </View>
+                    </SafeAreaView>
                 </KeyboardAvoidingView>
             </View>
             <View style={[styles.bottomSectionWrapper, {
@@ -344,14 +372,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     headerTitle: {
-        color: '#000',
         fontSize: 30,
         fontWeight: 'bold',
-        marginTop: 20,
         textAlign: 'center',
     },
     scrollViewWrapper: {
-        height: '70%',
+        backgroundColor: 'transparent',
         width: '90%',
     },
     titleAndParagraphWrapper: {
@@ -371,6 +397,7 @@ const styles = StyleSheet.create({
         marginTop: 3,
     },
     currentParagraphWrapper: {
+        flex: 1,
         fontSize: 18,
         marginTop: 20,
         textAlign: 'center',
