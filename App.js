@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View, ScrollView, KeyboardAvoidingView} from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View, 
+    ScrollView, KeyboardAvoidingView, Image
+} from 'react-native';
 import axios from 'axios';
 //import data from './assets/LDC1.json';
 import data from './assets/LDC1_DONE.json'
@@ -242,6 +244,12 @@ export default function App() {
         }
     }
 
+    function get_random_paragraph() {
+       let random = Math.floor(Math.random() * data.LDC1.length);
+        setCurrentTitle(data.LDC1[random].title);
+        setCurrentParagraph(data.LDC1[random].paragraph); 
+    }
+
     useEffect(() => {
         set_little_random_paragraph();
     }, []);
@@ -253,27 +261,23 @@ export default function App() {
                 height: '70%',
             }]}>
                 <Text style={[styles.headerTitle, 
-                    Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' }
+                    Platform.OS !== 'web' ? { marginTop: '15%' } : { marginTop: '5%' },
+                    {color: '#AA2D2D'}
                 ]}>
                     L'Eveil Des Consciences
                 </Text>
                 <KeyboardAvoidingView style={[styles.titleAndParagraphWrapper]}>
-                <View style={[styles.titleWrapper, 
-                    currentTitle.length > 35 ? { height: '14%' } : { height: '10%' }
-                ]}>
-                    <Text style={[styles.currentTitle, {
-                    }]}>
-                        {currentTitle}
-                    </Text>
-                </View>
                     <View style={[styles.scrollViewWrapper]}>
                         <ScrollView style={[styles.currentParagraphWrapper, {
                             backgroundColor: 'transparent',
                         }]}>
+                            <Text style={[styles.currentTitle, {
+                            }]}>
+                                {currentTitle}
+                            </Text>
                             <View style={{backgroundColor: 'transparent'}}>
                                 <Text style={{
                                     fontSize: 20,
-                                    textAlign: 'center',
                                 }}>
                                     {currentParagraph}
                                 </Text>
@@ -296,15 +300,32 @@ export default function App() {
                         autoFocus={true}
                         autoCapitalize='none'
                     />
+                    <Pressable style={{
+                        height: 60,
+                        width: '22.5%',
+                        backgroundColor: '#96DBF4',
+                        borderRadius: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderWidth: 2,
+                    }} onPress={() => { check_input({ key: 'Enter' }) }}>
+                        <Image
+                            style={styles.lensImage}
+                            source={require('./assets/Lens.png')}
+                        />
+                    </Pressable>
                 </View>
                 <View style={[styles.pressablesWrapper]}>
-                    <Pressable style={[styles.pressable]} onPress={() => {next_or_previous_paragraph('prev')}}>
+                    <Pressable style={[styles.pressablePrevNext]} onPress={() => {next_or_previous_paragraph('prev')}}>
                         <Text style={[styles.pressableText]} >Précédent</Text>
                     </Pressable>
-                    <Pressable style={[styles.pressable]} onPress={() => { check_input({ key: 'Enter' }) }}>
-                        <Text style={[styles.pressableText]}>Rechercher</Text>
+                    <Pressable style={[styles.pressableDice]} onPress={(() => {get_random_paragraph()})}>
+                        <Image
+                            style={styles.diceImage}
+                            source={require('./assets/Dice.png')}
+                        />
                     </Pressable>
-                    <Pressable style={[styles.pressable]} onPress={() => {next_or_previous_paragraph('next')}}>
+                    <Pressable style={[styles.pressablePrevNext]} onPress={() => {next_or_previous_paragraph('next')}}>
                         <Text style={[styles.pressableText]} >Suivant</Text>
                     </Pressable>
                 </View>
@@ -331,7 +352,7 @@ const styles = StyleSheet.create({
     },
     scrollViewWrapper: {
         height: '70%',
-        width: '95%',
+        width: '90%',
     },
     titleAndParagraphWrapper: {
         width: '100%',
@@ -344,10 +365,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     currentTitle: {
-        width: '90%',
+        width: '92.5%',
         fontSize: 20,
         fontWeight: 'bold',
-        textAlign: 'center',
         marginTop: 3,
     },
     currentParagraphWrapper: {
@@ -359,39 +379,64 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: '25%',
-        justifyContent: 'space-evenly',
+        justifyContent: 'flex-end',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.5)',
+        //backgroundColor: 'rgba(255,255,255,0.5)',
         top: '75%',
     },
     inputWrapper: {
-        width: '100%',
-        alignItems: 'center',
+        width: '95%',
+        marginBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     input: {
-        height: 50,
-        width: '90%',
+        height: 60,
+        width: '75%',
         borderColor: 'gray',
         borderWidth: 1,
+        borderRadius: 10,
         paddingHorizontal: 10,
         fontSize: 24,
     },
     pressablesWrapper: {
-        height: 60,
-        width: '90%',
+        height: 70,
+        width: '95%',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
+        marginBottom: 30,
     },
-    pressable: {
+    pressablePrevNext: {
         height: '80%',
-        width: '28%',
+        width: '36%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'grey',
+        backgroundColor: '#E16F6F',
         borderRadius: 10,
+        borderWidth: 2,
+    },
+    pressableDice: {
+        height: '80%',
+        width: '21%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#C3FFD3',
+        borderWidth: 2,
+        borderRadius: 10,
+    },
+    diceImage: {
+        height: '80%',
+        width: 'auto',
+        aspectRatio: 1,
+    },
+    lensImage: {
+        height: '70%',
+        width: 'auto',
+        aspectRatio: 1,
     },
     pressableText: {
         fontSize: 18,
+        fontWeight: 'bold',
     }
 });
