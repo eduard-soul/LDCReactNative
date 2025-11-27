@@ -2,7 +2,7 @@
 L'éveil des Consciences Moteur de Recherche React Native
 
 # Version actuel :
-<img width="781/3" height="847/3" alt="Screenshot 2025-11-27 at 07 21 02" src="https://github.com/user-attachments/assets/9d852956-7114-4c8d-b7c5-236bd0f9e7a0" />
+<img width="260" height="282" alt="Screenshot 2025-11-27 at 07 21 02" src="https://github.com/user-attachments/assets/9d852956-7114-4c8d-b7c5-236bd0f9e7a0" />
 
 # A faire :
 [ ] Reparser LDC 1, avec une IA, pour enlever toutes fautes, manques d'espaces
