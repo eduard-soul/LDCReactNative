@@ -12,12 +12,12 @@ Moteur de Recherche React Native
 ## À faire
 
 - [ ] Reparser **LDC 1**, avec une IA, pour enlever toutes les fautes et manques d'espaces
-- [ ] Ajouter **LDC 2**
+- [ ] Ajouter **LDC 2** et faire de meme
 - [ ] Faire un meilleur système de recherche
 - [ ] Ajouter un **chatbot IA** pour discuter de tout, avec le PDV de l'Éveil Des Consciences
 - [ ] Utiliser la dernière version de **React Native** avec meilleure intégration **iOS** (Liquid Glass)
 - [ ] Faire un **modèle audio** de la voix de Delavier (et d'autres) pour lire des paragraphes/chatbot avec voix
-- [ ] Modèle local d’IA : rien à télécharger, compression à analyser
+- [ ] Modèle local d’IA : rien à télécharger, compression à voir
 - [ ] Faire un design plus beau et agréable
 - [ ] Refaire le **README** pour faciliter l’ouverture à l’open source
 
